@@ -1,0 +1,958 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PhishGuard AI | Threat Detection Center</title>
+
+  <style>
+    :root {
+      --bg: #080d19;
+      --panel: #111a2b;
+      --panel2: #162238;
+      --border: #263650;
+      --text: #edf3ff;
+      --muted: #91a1bc;
+      --blue: #4d8dff;
+      --green: #35d6a0;
+      --red: #ff607b;
+      --purple: #9b8aff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   sans-serif;
+      font-size: 14px;
+    }
+
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .layout {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 235px minmax(0, 1fr);
+    }
+
+    aside {
+      background: #0c1423;
+      border-right: 1px solid var(--border);
+      padding: 25px 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin: 0 0 8px;
+      font-size: 19px;
+      font-weight: 750;
+      letter-spacing: -.6px;
+    }
+
+    .logo {
+      width: 39px;
+      height: 39px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #387fff, #8a68ed);
+      font-size: 21px;
+    }
+
+    .tagline {
+      color: var(--muted);
+      font-size: 11px;
+      margin: 0 0 35px 50px;
+    }
+
+    .nav-label {
+      color: #7384a0;
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: 1.4px;
+      margin: 25px 10px 12px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 12px;
+      margin: 5px 0;
+      border-radius: 9px;
+      color: #aebbd0;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav.active {
+      color: white;
+      background: #1b3155;
+      box-shadow: inset 3px 0 var(--blue);
+    }
+
+    .nav:hover { background: #17243a; }
+
+    .side-bottom {
+      margin-top: 50px;
+      padding: 15px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    main { min-width: 0; }
+
+    header {
+      min-height: 75px;
+      padding: 17px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    header h2 {
+      margin: 0 0 5px;
+      font-size: 17px;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--green);
+      font-size: 12px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      display: inline-block;
+    }
+
+    .content {
+      max-width: 1450px;
+      margin: auto;
+      padding: 28px;
+    }
+
+    .eyebrow {
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      margin-bottom: 23px;
+    }
+
+    .hero h1 {
+      font-size: clamp(24px, 3vw, 34px);
+      letter-spacing: -1px;
+      margin: 10px 0;
+    }
+
+    .hero p {
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 620px;
+      margin: 0;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 22px;
+      margin-bottom: 22px;
+      min-width: 0;
+    }
+
+    .panel-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .panel-title h3 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .muted { color: var(--muted); }
+    .small { font-size: 12px; }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .tab {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 10px 15px;
+      border-radius: 8px;
+    }
+
+    .tab.active {
+      background: #1b3155;
+      color: white;
+      border-color: #386fc0;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    input, textarea {
+      width: 100%;
+      background: #0b1322;
+      border: 1px solid #30425f;
+      color: var(--text);
+      border-radius: 9px;
+      padding: 14px;
+      outline: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px #4d8dff22;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: #7485a1;
+    }
+
+    .primary {
+      background: var(--blue);
+      color: white;
+      border: 0;
+      padding: 13px 19px;
+      border-radius: 9px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .primary:hover { background: #3679ed; }
+    .primary:disabled { opacity: .6; cursor: wait; }
+
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .preset {
+      border: 1px solid var(--border);
+      color: #c1cde0;
+      background: var(--panel2);
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-size: 11px;
+    }
+
+    .preset:hover { border-color: var(--blue); }
+
+    .notice {
+      display: none;
+      border-radius: 9px;
+      padding: 12px 14px;
+      margin-top: 15px;
+      line-height: 1.5;
+    }
+
+    .notice.error {
+      display: block;
+      background: #401d2a;
+      color: #ffb8c4;
+      border: 1px solid #733448;
+    }
+
+    .notice.info {
+      display: block;
+      background: #152c4b;
+      color: #c2ddff;
+      border: 1px solid #2a4c77;
+    }
+
+    .results {
+      display: none;
+      grid-template-columns: minmax(0, .9fr) minmax(0, 1.4fr);
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .results.show { display: grid; }
+
+    .result-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 23px;
+      min-width: 0;
+    }
+
+    .verdict {
+      display: inline-block;
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-weight: 750;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      background: #153c32;
+      color: var(--green);
+    }
+
+    .verdict.bad {
+      color: #ff8ca0;
+      background: #441d2b;
+    }
+
+    .score {
+      font-size: 43px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      margin: 20px 0 5px;
+    }
+
+    .meter {
+      background: #27354c;
+      height: 9px;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 17px 0 10px;
+    }
+
+    .meter-fill {
+      height: 100%;
+      width: 0;
+      background: var(--green);
+      border-radius: 20px;
+      transition: width .4s ease;
+    }
+
+    .risk-labels {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .reasons {
+      padding-left: 20px;
+      color: #bdc9dc;
+      line-height: 1.8;
+      overflow-wrap: anywhere;
+    }
+
+    .empty-reasons { color: var(--green); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 15px;
+      margin-bottom: 22px;
+    }
+
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 19px;
+      min-width: 0;
+    }
+
+    .stat-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stat-icon {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: #20365b;
+      font-size: 17px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 27px;
+      margin: 15px 0 7px;
+      overflow-wrap: anywhere;
+    }
+
+    .stat p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      min-width: 600px;
+    }
+
+    th {
+      color: #8fa1bc;
+      font-size: 10px;
+      letter-spacing: .7px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    th, td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td { font-size: 12px; }
+
+    td.url {
+      max-width: 360px;
+      overflow-wrap: anywhere;
+      color: #c9d8f0;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 8px;
+      border-radius: 6px;
+      background: #153c32;
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 750;
+    }
+
+    .badge.bad {
+      background: #441d2b;
+      color: #ff8ca0;
+    }
+
+    .empty-row {
+      text-align: center;
+      padding: 28px;
+      color: var(--muted);
+    }
+
+    footer {
+      border: 1px solid var(--border);
+      background: #101c2e;
+      border-radius: 12px;
+      padding: 17px;
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    footer strong { color: #dce8fc; }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 850px) {
+      .layout { grid-template-columns: 1fr; }
+      aside { border-right: 0; border-bottom: 1px solid var(--border); padding: 15px; }
+      .tagline, .nav-label, .side-bottom { display: none; }
+      .brand { margin-bottom: 14px; }
+      .nav-list { display: flex; flex-wrap: wrap; gap: 4px; }
+      .nav { padding: 9px; margin: 0; font-size: 12px; }
+      .content { padding: 18px; }
+      header { padding: 15px 18px; }
+    }
+
+    @media (max-width: 600px) {
+      .input-row { flex-direction: column; }
+      .input-row .primary { width: 100%; }
+      .results.show { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr; }
+      .stat { padding: 15px; }
+      .score { font-size: 36px; }
+      .panel, .result-card { padding: 17px; }
+      header h2 { font-size: 15px; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="layout">
+
+  <aside>
+    <div class="brand">
+      <div class="logo">🛡</div>
+      <span>PhishGuard <span style="color:#75a5ff">AI</span></span>
+    </div>
+    <p class="tagline">Autonomous SecOps Precision</p>
+
+    <div class="nav-label">WORKSPACE</div>
+    <nav class="nav-list">
+      <a class="nav active" href="#dashboard">◈ Dashboard</a>
+      <a class="nav" href="#scanner" data-tab="url">⌕ URL Scanner</a>
+      <a class="nav" href="#scanner" data-tab="email">✉ Email Scanner</a>
+      <a class="nav" href="#history">◷ Scan History</a>
+    </nav>
+
+    <div class="nav-label">SYSTEM</div>
+    <a class="nav" href="#security">◉ Security Advisory</a>
+
+    <div class="side-bottom">
+      <div style="color:#e7efff;font-weight:700;margin-bottom:6px">
+        ◉ Local ML Engine
+      </div>
+      Your trained model is connected through your local Flask server.
+      <div style="margin-top:9px;color:var(--green)">
+        ● Development environment
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <div>
+        <h2>Threat Detection Center</h2>
+        <p>AI-powered phishing analysis and URL protection</p>
+      </div>
+      <span class="status"><span class="dot"></span> Local server</span>
+    </header>
+
+    <div class="content" id="dashboard">
+
+      <section class="hero">
+        <div class="eyebrow">Security operations / Overview</div>
+        <h1>Stay one step ahead of phishing.</h1>
+        <p>
+          Analyze suspicious URLs with your machine-learning model.
+          Review risk scores, identify warning signs, and inspect
+          your recent scans — without visiting the submitted links.
+        </p>
+      </section>
+
+      <section class="panel" id="scanner">
+        <div class="panel-title">
+          <h3>◈ Threat analysis</h3>
+          <span class="small muted">URL intelligence</span>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active" id="urlTab" type="button">
+            ⌕ URL Quick Scanner
+          </button>
+          <button class="tab" id="emailTab" type="button">
+            ✉ Email Deep Scan
+          </button>
+        </div>
+
+        <div id="urlPanel">
+          <label for="urlInput" class="small muted">
+            TARGET URL
+          </label>
+
+          <div class="input-row" style="margin-top:9px">
+            <input id="urlInput" type="text"
+              placeholder="Paste a URL, e.g. https://example.com"
+              autocomplete="url" spellcheck="false">
+            <button class="primary" id="analyzeBtn" type="button">
+              Analyze URL →
+            </button>
+          </div>
+
+          <div class="presets">
+            <span class="small muted">QUICK TESTS:</span>
+            <button class="preset" data-url="https://www.wikipedia.org">
+              Example: familiar site
+            </button>
+            <button class="preset"
+              data-url="http://192.168.1.1/secure-login/verify-account.php">
+              Example: suspicious pattern
+            </button>
+          </div>
+          <p class="small muted">
+            URLs are analyzed as text. This app does not open or visit them.
+          </p>
+        </div>
+
+        <div id="emailPanel" class="hidden">
+          <label for="emailInput" class="small muted">
+            EMAIL CONTENT
+          </label>
+          <textarea id="emailInput" rows="5"
+            placeholder="Paste the email subject and body here..."></textarea>
+          <div class="notice info" style="display:block">
+            Email scanning is a planned feature and is not connected to
+            a trained email classifier yet. Your email will not be analyzed.
+          </div>
+        </div>
+
+        <div id="message" class="notice" role="status"
+          aria-live="polite"></div>
+      </section>
+
+      <section class="results" id="results" aria-live="polite">
+        <div class="result-card">
+          <div class="eyebrow">Model prediction</div>
+          <h3 style="margin:12px 0 18px">Threat assessment</h3>
+          <span class="verdict" id="verdict">Awaiting scan</span>
+
+          <div class="score" id="score">—</div>
+          <div class="small muted">Model phishing score</div>
+
+          <div class="meter">
+            <div class="meter-fill" id="meterFill"></div>
+          </div>
+          <div class="risk-labels">
+            <span>LOWER SCORE</span><span>HIGHER SCORE</span>
+          </div>
+
+          <p class="small muted" id="resultUrl"
+            style="overflow-wrap:anywhere;margin-top:18px"></p>
+        </div>
+
+        <div class="result-card">
+          <div class="eyebrow">Explainability</div>
+          <h3 style="margin:12px 0 5px">Detected warning signs</h3>
+          <p class="small muted">
+            These are rule-based URL indicators, not explanations of the
+            model's internal reasoning.
+          </p>
+          <ul class="reasons" id="reasons"></ul>
+        </div>
+      </section>
+
+      <section class="stats">
+        <article class="stat">
+          <div class="stat-top">
+            <span class="muted">Total scans this session</span>
+            <span class="stat-icon">⌕</span>
+          </div>
+          <strong id="totalScans">0</strong>
+          <p>Actual URL scans in this browser session</p>
+        </article>
+
+        <article class="stat">
+          <div class="stat-top">
+            <span class="muted">Flagged as suspicious</span>
+            <span class="stat-icon">⚠</span>
+          </div>
+          <strong id="flaggedScans">0</strong>
+          <p>Scans classified as suspicious by the model</p>
+        </article>
+
+        <article class="stat">
+          <div class="stat-top">
+            <span class="muted">Likely safe predictions</span>
+            <span class="stat-icon">✓</span>
+          </div>
+          <strong id="safeScans">0</strong>
+          <p>Scans classified as likely safe by the model</p>
+        </article>
+      </section>
+
+      <section class="panel" id="history">
+        <div class="panel-title">
+          <div>
+            <h3>Recent scan history</h3>
+            <p class="small muted">Results from this page session</p>
+          </div>
+          <button class="preset" id="clearHistory" type="button">
+            Clear history
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Target URL</th>
+                <th>Verdict</th>
+                <th>Phishing score</th>
+                <th>Scan time</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody">
+              <tr>
+                <td colspan="4" class="empty-row">
+                  No scans yet. Analyze a URL to see your first result.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer id="security">
+        <span style="font-size:21px">ⓘ</span>
+        <div>
+          <strong>Security advisory</strong><br>
+          This is an educational prototype. Predictions may be incorrect.
+          A high or low score is not proof that a URL is malicious or safe.
+          Warning signs are heuristic indicators. Never enter credentials
+          on a site you do not trust.
+        </div>
+      </footer>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  const urlInput = document.getElementById("urlInput");
+  const analyzeBtn = document.getElementById("analyzeBtn");
+  const message = document.getElementById("message");
+  const results = document.getElementById("results");
+
+  const history = [];
+  let total = 0;
+  let flagged = 0;
+  let safe = 0;
+
+  function showMessage(text, type) {
+    message.textContent = text;
+    message.className = "notice " + type;
+  }
+
+  function clearMessage() {
+    message.textContent = "";
+    message.className = "notice";
+  }
+
+  function selectTab(tab) {
+    const isEmail = tab === "email";
+
+    document.getElementById("urlTab").classList.toggle("active", !isEmail);
+    document.getElementById("emailTab").classList.toggle("active", isEmail);
+    document.getElementById("urlPanel").classList.toggle("hidden", isEmail);
+    document.getElementById("emailPanel").classList.toggle("hidden", !isEmail);
+
+    results.classList.remove("show");
+    clearMessage();
+
+    if (isEmail) {
+      showMessage(
+        "Email analysis is not implemented yet. The current ML model only analyzes URLs.",
+        "info"
+      );
+    }
+  }
+
+  document.getElementById("urlTab").addEventListener("click", () => {
+    selectTab("url");
+  });
+
+  document.getElementById("emailTab").addEventListener("click", () => {
+    selectTab("email");
+  });
+
+  document.querySelectorAll("[data-tab]").forEach(link => {
+    link.addEventListener("click", () => {
+      selectTab(link.dataset.tab);
+    });
+  });
+
+  document.querySelectorAll("[data-url]").forEach(button => {
+    button.addEventListener("click", () => {
+      selectTab("url");
+      urlInput.value = button.dataset.url;
+      urlInput.focus();
+    });
+  });
+
+  function updateStats() {
+    document.getElementById("totalScans").textContent = total;
+    document.getElementById("flaggedScans").textContent = flagged;
+    document.getElementById("safeScans").textContent = safe;
+  }
+
+  function renderHistory() {
+    const body = document.getElementById("historyBody");
+    body.replaceChildren();
+
+    if (history.length === 0) {
+      const row = body.insertRow();
+      const cell = row.insertCell();
+      cell.colSpan = 4;
+      cell.className = "empty-row";
+      cell.textContent = "No scans yet. Analyze a URL to see your first result.";
+      return;
+    }
+
+    history.forEach(item => {
+      const row = body.insertRow();
+
+      const urlCell = row.insertCell();
+      urlCell.className = "url";
+      urlCell.textContent = item.url;
+
+      const verdictCell = row.insertCell();
+      const badge = document.createElement("span");
+      badge.className = "badge" + (item.suspicious ? " bad" : "");
+      badge.textContent = item.verdict;
+      verdictCell.appendChild(badge);
+
+      row.insertCell().textContent = item.score + "%";
+      row.insertCell().textContent = item.time;
+    });
+  }
+
+  function displayResult(data, url) {
+    const score = Number(data.phishing_probability);
+
+    if (!Number.isFinite(score) || score < 0 || score > 100) {
+      throw new Error("The server returned an invalid phishing score.");
+    }
+
+    const suspicious = data.verdict === "Suspicious";
+    const verdict = document.getElementById("verdict");
+
+    verdict.textContent = data.verdict;
+    verdict.className = "verdict" + (suspicious ? " bad" : "");
+
+    document.getElementById("score").textContent =
+      score.toFixed(1) + "%";
+
+    document.getElementById("meterFill").style.width = score + "%";
+    document.getElementById("meterFill").style.background =
+      suspicious ? "var(--red)" : "var(--green)";
+
+    document.getElementById("resultUrl").textContent = url;
+
+    const reasons = document.getElementById("reasons");
+    reasons.replaceChildren();
+
+    if (Array.isArray(data.reasons) && data.reasons.length) {
+      data.reasons.forEach(reason => {
+        const li = document.createElement("li");
+        li.textContent = reason;
+        reasons.appendChild(li);
+      });
+    } else {
+      const li = document.createElement("li");
+      li.className = "empty-reasons";
+      li.textContent = "No configured warning rules were triggered.";
+      reasons.appendChild(li);
+    }
+
+    results.classList.add("show");
+
+    total++;
+    if (suspicious) flagged++;
+    else safe++;
+
+    history.unshift({
+      url,
+      verdict: data.verdict,
+      score: score.toFixed(1),
+      suspicious,
+      time: new Date().toLocaleTimeString()
+    });
+
+    if (history.length > 10) history.pop();
+
+    updateStats();
+    renderHistory();
+  }
+
+  async function analyzeURL() {
+    const url = urlInput.value.trim();
+
+    clearMessage();
+    results.classList.remove("show");
+
+    if (!url) {
+      showMessage("Please enter a URL to analyze.", "error");
+      urlInput.focus();
+      return;
+    }
+
+    if (url.length > 2000) {
+      showMessage("The URL is too long. Please use at most 2000 characters.", "error");
+      return;
+    }
+
+    analyzeBtn.disabled = true;
+    analyzeBtn.textContent = "Analyzing...";
+
+    try {
+      const response = await fetch("/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "The server could not analyze this URL.");
+      }
+
+      displayResult(data, url);
+    } catch (error) {
+      showMessage(
+        error.message || "Could not connect to the Flask server. Check that it is running.",
+        "error"
+      );
+    } finally {
+      analyzeBtn.disabled = false;
+      analyzeBtn.textContent = "Analyze URL →";
+    }
+  }
+
+  analyzeBtn.addEventListener("click", analyzeURL);
+
+  urlInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") analyzeURL();
+  });
+
+  document.getElementById("clearHistory").addEventListener("click", () => {
+    history.length = 0;
+    total = 0;
+    flagged = 0;
+    safe = 0;
+    updateStats();
+    renderHistory();
+    results.classList.remove("show");
+    clearMessage();
+  });
+</script>
+</body>
+</html>
